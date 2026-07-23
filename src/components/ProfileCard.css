@@ -1,4 +1,21 @@
 .profile-card {
-    background-color: gray;
-    padding: 7rem;
+    padding: 25rem;
+}
+.logo :hover { 
+    transform: scale(1.5);
+}
+.profilecard {
+    background-image: url(/textbg.gif);
+    background-position: center;
+}
+.text-display {
+ font-size: 1rem;
+  font-weight: 700;
+  padding-top:1rem;
+  padding-bottom: 1rem;
+  color: #ffffff; /* White core */
+  text-shadow: 
+    0 0 3px rgba(239, 68, 68, 1),   /* Sharp inner red border */
+    0 0 8px rgba(239, 68, 68, 0.8), /* Medium red glow */
+    0 0 15px rgba(239, 68, 68, 0.4);/* Soft outer red dispersion */
 }

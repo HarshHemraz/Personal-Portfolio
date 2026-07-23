@@ -1,32 +1,48 @@
+import { useRef, useState } from 'react'
 import ProfileCard from './components/ProfileCard'
 import Background from './components/Background'
+import EnterGate from './components/Entergate'
+import MusicPlayer from './components/MusicProps'
+import type { MusicPlayerHandle } from './components/MusicProps'
 import './App.css'
-import { useRef } from 'react'
 
 function App() {
-const audioRef = useRef<HTMLAudioElement>(null);
-const startMusic = () => {
-  audioRef.current?.play();
-}
+  const [entered, setEntered] = useState(false)
+  const playerRef = useRef<MusicPlayerHandle>(null)
+
+  const handleEnter = () => {
+    playerRef.current?.play()
+    setTimeout(() => setEntered(true), 700) // matches EnterGate's fade-out duration
+  }
 
   return (
+    <div className='app-background min-h-screen w-full flex items-center justify-center'>
 
-    <div onClick={startMusic} className='app-background min-h-screen w-full flex items-center justify-center'>
-      
-      <Background videoURL='/Blink-eye-background.mp4'/>
-      <audio ref={audioRef} src='/seeme.mp3' loop></audio>
+      {!entered && <EnterGate onEnter={handleEnter} />}
+
+      <Background videoURL='/Blink-eye-background.mp4' />
+
       <div className='content-wrapper'>
-       <ProfileCard
-          name="Harsh"
-          tagline="Harsh's links"
+        <ProfileCard
+          name="Wizz"
+          tagline="Wizz's links"
           location="WonderLand"
-          username="Wizard"
-          lastSeen="2 hours ago"
-          avatarUrl="/favicon.svg"
+          avatarUrl="/avatar.png"
+          discordId="353953706384818177"
+          discordUrl='https://discord.com/channels/@me'
+          instagramUrl='https://www.instagram.com/?hl=en'
+          steamUrl='https://steamcommunity.com/id/90909090123/'
+          linkedin='https://www.linkedin.com/in/harsh-hemraz-38317b2b1/'
+        />
+        <MusicPlayer
+          ref={playerRef}
+          title='Augxst - See Me'
+          coverURL='/AudioBeat.gif'
+          songURL='/seeme.mp3'
+          volume={1}
         />
       </div>
     </div>
-   
   )
 }
 

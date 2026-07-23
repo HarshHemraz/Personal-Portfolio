@@ -1,41 +1,93 @@
 import './ProfileCard.css'
+import { useEffect, useState } from 'react';
 
 interface ProfileCardProps {
     name: string;
     tagline: string;
     location: string;
-    username: string;
-    lastSeen: string;
+    discordId: string;
     avatarUrl: string;
+    discordUrl: string;
+    instagramUrl: string;
+    steamUrl: string;
+    linkedin: string;
 }
 
-function ProfileCard({ name, tagline, location, username, lastSeen,avatarUrl} : ProfileCardProps) {
+interface LanyardData {
+  discord_user: {
+    username: string;
+    global_name: string;
+  };
+  discord_status: "online" | "idle" | "dnd" | "offline";
+  activities: { name: string; type: number; details?: string }[];
+  listening_to_spotify?: boolean;
+  spotify?: { song: string; artist: string };
+}
+
+function ProfileCard({ name, tagline, location, discordId, avatarUrl, discordUrl, linkedin, instagramUrl, steamUrl }: ProfileCardProps) {
+    const [presence, setPresence] = useState<LanyardData | null>(null);
+
+    useEffect(() => {
+        const fetchPresence = async () => {
+            const res = await fetch(`https://api.lanyard.rest/v1/users/${discordId}`);
+            const json = await res.json();
+            if (json.success) setPresence(json.data);
+        };
+
+        fetchPresence();
+        const interval = setInterval(fetchPresence, 15000);
+        return () => clearInterval(interval);
+    }, [discordId]);
+
+    const activity = presence?.activities.find(a => a.type !== 4);
+
+   const statusText = presence?.listening_to_spotify && presence.spotify
+    ? `🎧 Listening to ${presence.spotify.song} — ${presence.spotify.artist}`
+    : activity?.type === 0
+    ? `🎮 Playing ${activity.name}${activity.details ? ` — ${activity.details}` : ""}`
+    : activity
+    ? `${activity.name}${activity.details ? ` — ${activity.details}` : ""}`
+    : presence?.discord_status === "offline"
+    ? "Out of town"
+    : presence
+    ? "🟢 Currently Online  "
+    : "Loading...";
+
     return (
-    <div className='profile-card'>
+    <div className='profilecard gap-5 bg-black/50 backdrop-blur-md rounded-2xl px-4 py-3 text-white mt-4'>
 
-        <div className='flex justify-center'>
-        <img src={avatarUrl} alt='avatar' className='avatar' />
+        <div className='flex justify-center p-5'>
+        <img src={avatarUrl} alt='avatar' className='avatar h-20 w-25 rounded-full' />
         </div>
 
-        <h1 className='name'>{name}</h1>
+        <div className='text-display flex justify-center items-center flex-col'>
+        <h1 className='name text-2xl'>{name}</h1>
         <p className='tagline'>{tagline}</p>
-        <p className='location'>📍 {location}</p>
-
-        <div className='flex flex-row'>
-            <img src={avatarUrl} className='badge-avatar' />
-            <img src={avatarUrl} className='badge-avatar' />
-            <img src={avatarUrl} className='badge-avatar' />
-            <img src={avatarUrl} className='badge-avatar' />
-            <img src={avatarUrl} className='badge-avatar' />
-            </div>
-            <div className='badge-text'>
-                <p className='username'>
-                    {username} 
-                </p>
-                <p className='last-seen'>Last seen {lastSeen}</p>
-            </div>
+        <p className='location text-xs pt-5'>📍{location}</p>
         </div>
-   
+
+        <div className='flex justify-center flex-row'>
+            <a href={discordUrl} className='logo'>
+            <img src="/DiscordLogo.gif" className='badge-avatar w-15 h-15' />
+            </a>
+            <a href={instagramUrl} className='logo'>
+            <img src="Insta-logo.gif" className='badge-avatar mt-1.5 w-12 h-12' />
+            </a>
+            <a href={steamUrl} className='logo'>
+            <img src="Steam.gif" className='badge-avatar mt-1.5 w-12 h-12' />
+            </a>
+            <a href={linkedin} className='logo'>
+            <img src="LinkedIn-logo.gif" className='badge-avatar mt-1.5 w-12 h-12' />
+            </a>
+        </div>
+
+        <div className='text-display flex justify-center items-center flex-col'>
+            <p className='username'>
+                {presence?.discord_user.global_name || presence?.discord_user.username || 'Loading...'}
+            </p>
+            <p className='last-seen pb-5'>{statusText}</p>
+        </div>
+    </div>
     );
 }
 

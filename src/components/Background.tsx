@@ -1,9 +1,11 @@
+
 interface BackgroundProps {
     videoURL: string;
 }
 
 function Background({videoURL}: BackgroundProps) {
     return (
+        <div className="img-bg">
         <video
         autoPlay
         loop
@@ -11,8 +13,10 @@ function Background({videoURL}: BackgroundProps) {
         playsInline
         className="absolute top-0 left-0 w-full h-full object-cover -z-10"
         >
-            <source src={videoURL} type="video/mp4" />
+            <source  src={videoURL} type="video/mp4" />
         </video>
+        </div>
+
     )
 }
 
